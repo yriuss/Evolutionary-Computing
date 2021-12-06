@@ -21,7 +21,7 @@ class Model():
         self.mutation = "bit-flipping"
         self.offspring_selection = "fitness proportional selection"
         self.parent_selection = "fitness proportional selection"
-        self.mutation_rate = 0.1
+        self.mutation_rate = 0.01
         self.counter = 0
 
     def termination_condition(self, fitness):
@@ -29,24 +29,20 @@ class Model():
         print("Generation: ", self.counter)
         print("Best fitness: ",fitness[np.argmax(fitness)])
 
-        if(self.counter> 100):
+        if(self.counter> 50):
             return False
         else:
             return True
 
 def knapsack_problem(x):
-    while(sum(x[0:17]*OBJECTS_VOLUME) > VM1):
+    while(sum(x[0:17]*OBJECTS_VOLUME) > VM1+VM2+VM3):
         x[np.random.randint(low=0,high=17)] = 0
-    while(sum(x[17:34]*OBJECTS_VOLUME) > VM2):
-        x[np.random.randint(low=17,high=34)] = 0
-    while(sum(x[34:51]*OBJECTS_VOLUME) > VM3):
-        x[np.random.randint(low=34,high=51)] = 0
     
-    return sum(x[0:17]*OBJECTS_VALUE) + sum(x[17:34]*OBJECTS_VALUE) + sum(x[34:51]*OBJECTS_VALUE)
+    return sum(x[0:17]*OBJECTS_VALUE)
 
 def main():
     model = Model(knapsack_problem)
-    pop = np.random.randint(low=0,high=2, size=(3,51))
+    pop = np.random.randint(low=0,high=2, size=(50,17))
     ga_alg = GA(pop)
 
     start = time.time()
