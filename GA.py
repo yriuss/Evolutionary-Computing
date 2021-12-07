@@ -7,23 +7,20 @@ import time
 from numpy.core.fromnumeric import shape, var
 from numpy.lib.index_tricks import ravel_multi_index
 class GA():
-    def __init__(self, population, Ub=1, Lb=0, representation="float") -> None:
-        if type(population) is np.ndarray:
-            self.population = population
+    def __init__(self, model) -> None:
+        
+        if type(model.pop) is np.ndarray:
+            self.population = model.pop
         else:
             raise AssertionError("Not a valid population!")
-        self.Ub = Ub
-        self.Lb = Lb
-        self.pop_size = len(population)
-        self.parents = np.zeros(population.shape)
-        self.pop_shape = population.shape
-        self.new_population = np.zeros(population.shape)
-        self.fitness = np.zeros(population.size)
-
-        if(representation == "float"):
-            self.representation  = representation
-        else:
-            raise AssertionError("Not a valid representation!")
+        self.Ub = model.UB
+        self.Lb = model.LB
+        self.pop_size = len(model.pop)
+        self.parents = np.zeros(model.pop.shape)
+        self.pop_shape = model.pop.shape
+        self.new_population = np.zeros(model.pop.shape)
+        self.fitness = np.zeros(model.pop.size)
+        self.best_fitness = 0
 
     def uniform_mutation(self, gene, mutation_rate):
         for i in range(gene.size):
@@ -110,10 +107,14 @@ class GA():
         if(is_offspring):
             for i in range(self.pop_size):
                 evaluations[i] = model.objective_function(self.population[i])
+            
         else:
             for i in range(self.pop_size):
                 evaluations[i] = model.objective_function(self.population[i])
+            self.best_fitness = model.objective_function(self.population[np.argmax(self.fitness)])
         
+        
+
         if(model.max_or_min):
             if((evaluations<0).sum() > 0):
                 evaluations = evaluations - np.amin(evaluations)
@@ -176,19 +177,48 @@ class GA():
         print("Fitness of alternative ", model.objective_function(self.population[2]))
     
     def run(self, model):
-        while(model.termination_condition(self.fitness)):
+        condition = True
+        while(condition):
             self.evaluate(model)
             self.select_parents(model)
             #print(self.fitness)
             self.recombine(model)
             self.mutate(model)
             self.evaluate(model, True)
+            condition = model.termination_condition(self.best_fitness)
             #print(self.fitness)
             #self.select_offspring(model)
         self.return_best(model)
 
 
+class Model():
+    def __init__(self, pop, objective_function, recombination, mutation, offspring_selection, parent_selection, mutation_rate, n_of_generations, UB, LB, max_or_min, alpha = 0.5, avg = 0, std_dev = 0.5) -> None:
+        self.max_or_min = max_or_min
+        self.pop = pop
+        self.UB = UB
+        self.LB = LB
+        self.objective_function = objective_function
+        self.recombination = recombination
+        self.mutation = mutation
+        self.offspring_selection = offspring_selection
+        self.parent_selection = parent_selection
+        self.alpha = alpha
+        self.avg = avg
+        self.std_dev = std_dev
+        self.mutation_rate = mutation_rate
+        self.counter = 0
+        self.n_of_generations = n_of_generations
+        self.fitness = []
 
+    def termination_condition(self, fitness):
+        self.counter += 1
+        print("Generation: ", self.counter)
+        print("Best fitness: ",fitness)
+        self.fitness.append(fitness)
+        if(self.counter> self.n_of_generations):
+            return False
+        else:
+            return True
 
 
 #As linhas comentadas abaixo foram utilizadas como script de teste

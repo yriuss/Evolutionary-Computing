@@ -5,19 +5,19 @@ from numpy import random
 import time
 
 class ES():
-    def __init__(self, population, model,Ub=1, Lb=0) -> None:
-        if type(population) is np.ndarray:
-            self.population = population
+    def __init__(self,model) -> None:
+        if type(model.pop) is np.ndarray:
+            self.population = model.pop
         else:
             raise AssertionError("Not a valid population!")
-        self.Ub = Ub
-        self.Lb = Lb
-        self.mu = len(population)
-        self.pop_shape = population.shape
+        self.Ub = model.UB
+        self.Lb = model.LB
+        self.mu = len(model.pop)
+        self.pop_shape = model.pop.shape
         
         self.sigma = model.sigma
         self.k_last = model.k
-        self.offspring = np.zeros((model.lam,population.shape[1]))
+        self.offspring = np.zeros((model.lam,model.pop.shape[1]))
         self.fitness = np.zeros(model.lam)
         self.k = 0
         self.last_better = 0
@@ -52,7 +52,7 @@ class ES():
 
     
     def select_parents(self, model):
-        if(model.parent_selection == "test"):
+        if(model.parent_selection == "random"):
             for i in range(model.lam):
                 rand_idx = np.random.randint(low=0, high=model.mu)
                 self.offspring[i] = self.population[rand_idx]
@@ -83,6 +83,8 @@ class ES():
             evaluations = np.zeros(model.mu)
             for i in range(model.mu):
                 evaluations[i] = model.objective_function(self.population[i])
+            self.best = model.objective_function(self.offspring[np.argmax(self.fitness)])
+            
         
         if(model.max_or_min):
             if((evaluations<0).sum() > 0):
@@ -96,68 +98,49 @@ class ES():
     def return_best(self, model):
         print("The best gene is ", self.offspring[np.argmax(self.fitness)])
         print("Alternative gene ", self.offspring[1])
-        print("Fitness of best ", model.objective_function(self.offspring[np.argmax(self.fitness)]))
+        print("Fitness of best ", )
         print("Fitness of alternative ", model.objective_function(self.offspring[1]))
         
     def run(self, model):
-        while(model.termination_condition(self.fitness)):
+        condition = True
+        while(condition):
             self.evaluate(model)
             self.select_parents(model)
             self.evaluate(model, True)
             self.mutate(model)
             self.select_offspring(model)
+            condition = model.termination_condition(self.best)
         self.return_best(model)
 
 
 class Model():
-    def __init__(self, objective_function) -> None:
-        self.max_or_min = 0
+    def __init__(self, pop, objective_function,  mutation, offspring_selection, parent_selection, sigma, lam, mu, k, n_of_generations, UB, LB, max_or_min, mutation_avg = 0) -> None:
+        self.max_or_min = max_or_min
+        self.pop = pop
         self.objective_function = objective_function
-        self.mutation = "uniform mutation"
-        self.offspring_selection = "mu,lambda"
-        self.parent_selection = "test"
-        self.sigma = 2
-        self.lam = 300
-        self.mu = 40
-        self.k = 10
+        self.mutation = mutation
+        self.offspring_selection = offspring_selection
+        self.parent_selection = parent_selection
+        self.sigma = sigma
+        self.lam = lam
+        self.mu = mu
+        self.k = k
         self.counter = 0
-        self.mutation_avg = 0
+        self.mutation_avg = mutation_avg
+        self.fitness = []
+        self.UB = UB
+        self.LB = LB
+        self.n_of_generations = n_of_generations
 
     def termination_condition(self, fitness):
         self.counter += 1
         print("Generation: ", self.counter)
-        print("Best fitness: ",fitness[np.argmax(fitness)])
-
-        if(self.counter> 3000):
+        print("Best fitness: ",fitness)
+        self.fitness.append(fitness)
+        if(self.counter> self.n_of_generations):
             return False
         else:
             return True
-
-def ackley(x):
-    x1 = x[0]
-    x2 = x[1]
-
-    a = 20
-    b = 0.2
-    c = 2*np.pi
-    
-    sum1 = x1**2 + x2**2 
-    sum2 = np.cos(c*x1) + np.cos(c*x2)
-    term1 = - a * np.exp(-b * ((1/2.) * sum1**(0.5)))
-    term2 = - np.exp((1/2.)*sum2)
-    return term1 + term2 + a + np.exp(1)
-
-
-def main():
-    model = Model(ackley)
-    pop = np.random.uniform(low=-32, high=32, size=(model.mu,2))
-    ga_alg = ES(pop, model, 32.768, -32.768)
-
-    start = time.time()
-    ga_alg.run(model)
-    stop = time.time()
-
-    print("Tempo de processamento foi de ", stop - start)
 
 if __name__ == "__main__":
     main()
