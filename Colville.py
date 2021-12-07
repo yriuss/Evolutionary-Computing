@@ -4,19 +4,19 @@ import matplotlib.pyplot as plt
 from numpy import random
 import time
 from GA import GA
-from functions import Griewank
+from functions import Colville, Griewank
 from ES import ES
 
 from GA import GA
 from GA import Model as ModelGA
 
-from functions import Griewank
+from functions import Trid
 
 from ES import ES
 from ES import Model as ModelES
 
-UB = 32
-LB = -32
+UB = 10
+LB = -10
 
 
 
@@ -26,17 +26,17 @@ LB = -32
 def main():
 
     #ABAIXO É PARA O GA
-    pop = np.random.uniform(low=LB, high=UB, size=(700,2))
+    pop = np.random.uniform(low=LB, high=UB, size=(700,4))
     
     model = ModelGA(
     pop,
-    Griewank().compute, 
+    Colville().compute, 
     "whole arithmetic recombination", 
     "uniform mutation",
     "fitness proportional selection",
     "fitness proportional selection",
-    0.01,
-    300,
+    0.03,
+    1000,
     UB,
     LB,
     0)
@@ -49,11 +49,12 @@ def main():
     print("Tempo de processamento foi de ", stop - start)
 
     #ABAIXO É PARA O ES
+    
     #pop_size = 40
-    #pop = np.random.uniform(low=-32, high=32, size=(pop_size,2))
+    #pop = np.random.uniform(low=-32, high=32, size=(pop_size,4))
     #model = ModelES(
     #pop,
-    #Griewank().compute,
+    #Colville().compute,
     #"uniform mutation",
     #"mu,lambda",
     #"random",
@@ -61,7 +62,7 @@ def main():
     #300,
     #40,
     #10,
-    #1000,
+    #1500,
     #UB,
     #LB,
     #0)

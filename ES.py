@@ -98,7 +98,7 @@ class ES():
     def return_best(self, model):
         print("The best gene is ", self.offspring[np.argmax(self.fitness)])
         print("Alternative gene ", self.offspring[1])
-        print("Fitness of best ", )
+        print("Fitness of best ", model.objective_function(self.offspring[np.argmax(self.fitness)]))
         print("Fitness of alternative ", model.objective_function(self.offspring[1]))
         
     def run(self, model):

@@ -1,11 +1,7 @@
 import numpy as np
 import random as r
-import matplotlib.pyplot as plt
-from numpy import random
-import time
 
-from numpy.core.fromnumeric import shape, var
-from numpy.lib.index_tricks import ravel_multi_index
+
 class GA():
     def __init__(self, model) -> None:
         

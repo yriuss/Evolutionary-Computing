@@ -10,13 +10,13 @@ from ES import ES
 from GA import GA
 from GA import Model as ModelGA
 
-from functions import Griewank
+from functions import Trid
 
 from ES import ES
 from ES import Model as ModelES
 
-UB = 32
-LB = -32
+UB = 25
+LB = -25
 
 
 
@@ -26,17 +26,17 @@ LB = -32
 def main():
 
     #ABAIXO É PARA O GA
-    pop = np.random.uniform(low=LB, high=UB, size=(700,2))
+    pop = np.random.uniform(low=LB, high=UB, size=(1000,5))
     
     model = ModelGA(
     pop,
-    Griewank().compute, 
+    Trid().compute, 
     "whole arithmetic recombination", 
     "uniform mutation",
     "fitness proportional selection",
     "fitness proportional selection",
-    0.01,
-    300,
+    0.05,
+    1000,
     UB,
     LB,
     0)
@@ -50,10 +50,10 @@ def main():
 
     #ABAIXO É PARA O ES
     #pop_size = 40
-    #pop = np.random.uniform(low=-32, high=32, size=(pop_size,2))
+    #pop = np.random.uniform(low=-32, high=32, size=(pop_size,5))
     #model = ModelES(
     #pop,
-    #Griewank().compute,
+    #Trid().compute,
     #"uniform mutation",
     #"mu,lambda",
     #"random",
