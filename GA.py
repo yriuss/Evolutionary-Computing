@@ -89,6 +89,9 @@ class GA():
     def whole_arithmetic_recombination(self, parent1, parent2, alpha= 0.5):
         return (alpha*parent1 + (1-alpha)*parent2, (1-alpha)*parent1 + alpha*parent2)
     
+    def whole_arithmetic_recombination(self, parent1, parent2, alpha= 0.5):
+        return (alpha*parent1 + (1-alpha)*parent2, (1-alpha)*parent1 + alpha*parent2)
+
     def fitness_proportional_selection(self, population, weights):
         return r.choices(population, weights)[0]
 
@@ -114,8 +117,10 @@ class GA():
         if(model.max_or_min):
             if((evaluations<0).sum() > 0):
                 evaluations = evaluations - np.amin(evaluations)
+                
         else:
-            evaluations = np.abs(evaluations - np.amax(evaluations))
+            numerador = np.abs(evaluations - np.amax(evaluations))
+            evaluations = numerador/np.amax(numerador)
         
         self.fitness = evaluations
 
@@ -126,6 +131,11 @@ class GA():
         if(model.parent_selection == "fitness proportional selection"):
             for i in range(self.pop_size):
                 self.parents[i] = self.fitness_proportional_selection(self.population, self.fitness)
+        elif(model.parent_selection == "fitness proportional selection kbest"):
+            temp = np.argpartition(-self.fitness, 30)
+            result_args = temp[:30]
+            for i in range(self.pop_size):
+                self.parents[i] = self.fitness_proportional_selection(self.population[result_args], self.fitness[result_args])
             
         else:
             raise AssertionError("Selection model not implemented or doesn't exist!")
@@ -136,6 +146,15 @@ class GA():
         if(model.recombination == "whole arithmetic recombination"):
             for i in range(self.pop_size):
                 (self.population[i], self.population[-i]) = self.whole_arithmetic_recombination(self.parents[-i], self.parents[i], model.alpha)
+        elif(model.recombination == "whole arithmetic recombination best"):
+            self.population = self.parents
+            self.evaluate(model)
+            for i in range(self.pop_size):
+                if(self.fitness[i] > self.fitness[-i]):
+                    (self.population[i], self.population[-i]) = self.whole_arithmetic_recombination(self.parents[i], self.parents[-i], model.alpha)
+                else:
+                    (self.population[i], self.population[-i]) = self.whole_arithmetic_recombination(self.parents[-i], self.parents[i], model.alpha)
+            self.evaluate(model)
         elif(model.recombination == "pmx"):
             for i in range(self.pop_size):
                 self.population[i] = self.pmx(self.parents[-i], self.parents[i])
@@ -163,13 +182,18 @@ class GA():
         if(model.offspring_selection == "fitness proportional selection"):
             for i in range(self.pop_size):
                 self.population[i] = self.fitness_proportional_selection(self.population, self.fitness)
+        elif(model.parent_selection == "fitness proportional selection kbest"):
+            temp = np.argpartition(-self.fitness, 30)
+            result_args = temp[:30]
+            for i in range(self.pop_size):
+                self.parents[i] = self.fitness_proportional_selection(self.population[result_args], self.fitness[result_args])
         else:
             raise AssertionError("Selection model not implemented or doesn't exist!")
     
     def return_best(self, model):
         print("The best gene is ", self.population[np.argmax(self.fitness)])
         print("Alternative gene ", self.population[1])
-        print("Fitness of best ", model.objective_function(self.population[np.argmax(self.fitness)]))
+        print("Fitness of best ", self.best_fitness)
         print("Fitness of alternative ", model.objective_function(self.population[2]))
     
     def run(self, model):
@@ -184,7 +208,7 @@ class GA():
             condition = model.termination_condition(self.best_fitness)
             #print(self.fitness)
             #self.select_offspring(model)
-        self.return_best(model)
+        #self.return_best(model)
 
 
 class Model():

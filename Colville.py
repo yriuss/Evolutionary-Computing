@@ -15,32 +15,29 @@ from functions import Trid
 from ES import ES
 from ES import Model as ModelES
 
-UB = 3
-LB = -3
-
-
-
+UB = 10
+LB = -10
 
 
 
 def main():
 
     #ABAIXO É PARA O GA
-    pop = np.random.uniform(low=LB, high=UB, size=(2000,4))
+    pop = np.random.uniform(low=LB, high=UB, size=(300,4))
     
     model = ModelGA(
     pop,
     Colville().compute, 
-    "whole arithmetic recombination", 
+    "whole arithmetic recombination best", 
     "uniform mutation",
-    "fitness proportional selection",
-    "fitness proportional selection",
+    "fitness proportional selection kbest",
+    "fitness proportional selection kbest",
     0.1,
-    2000,
+    10000,
     UB,
     LB,
     0,
-    alpha=0.5)
+    alpha=0.6)
     
     ga_alg = GA(model)
     start = time.time()
@@ -79,3 +76,4 @@ def main():
 
 if __name__=="__main__":
     main()
+    #pass

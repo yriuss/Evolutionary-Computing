@@ -56,8 +56,6 @@ class ES():
             for i in range(model.lam):
                 rand_idx = np.random.randint(low=0, high=model.mu)
                 self.offspring[i] = self.population[rand_idx]
-            
-            
         else:
             raise AssertionError("Selection model not implemented or doesn't exist!")
     
@@ -158,8 +156,8 @@ class Model():
 #print(a)
 
 
-fitness = np.array([200,3,4,2,1,7,8,4,5,123,1235,123])
-print(fitness[np.argpartition(fitness, -7)[:-7]])
+#fitness = np.array([200,3,4,2,1,7,8,4,5,123,1235,123])
+#print(fitness[np.argpartition(fitness, -7)[:-7]])
 
 
 #1. μ > 1 so that different strategies are present
