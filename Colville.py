@@ -15,8 +15,8 @@ from functions import Trid
 from ES import ES
 from ES import Model as ModelES
 
-UB = 10
-LB = -10
+UB = 3
+LB = -3
 
 
 
@@ -26,7 +26,7 @@ LB = -10
 def main():
 
     #ABAIXO É PARA O GA
-    pop = np.random.uniform(low=LB, high=UB, size=(700,4))
+    pop = np.random.uniform(low=LB, high=UB, size=(2000,4))
     
     model = ModelGA(
     pop,
@@ -35,11 +35,12 @@ def main():
     "uniform mutation",
     "fitness proportional selection",
     "fitness proportional selection",
-    0.03,
-    1000,
+    0.1,
+    2000,
     UB,
     LB,
-    0)
+    0,
+    alpha=0.5)
     
     ga_alg = GA(model)
     start = time.time()

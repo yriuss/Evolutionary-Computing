@@ -93,7 +93,6 @@ class ES():
             evaluations = np.abs(evaluations - np.amax(evaluations))
             
         self.fitness = evaluations
-        self.best = np.amax(evaluations)
 
     def return_best(self, model):
         print("The best gene is ", self.offspring[np.argmax(self.fitness)])
@@ -142,9 +141,6 @@ class Model():
         else:
             return True
 
-if __name__ == "__main__":
-    main()
-    pass
 
 #gene = np.array([np.random.uniform(low=-32, high=32, size=5),np.random.uniform(low=-32, high=32, size=5)])
 #print(gene)

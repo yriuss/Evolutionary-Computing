@@ -26,7 +26,7 @@ LB = -25
 def main():
 
     #ABAIXO É PARA O GA
-    pop = np.random.uniform(low=LB, high=UB, size=(1000,5))
+    pop = np.random.uniform(low=LB, high=UB, size=(400,5))
     
     model = ModelGA(
     pop,
@@ -35,11 +35,12 @@ def main():
     "uniform mutation",
     "fitness proportional selection",
     "fitness proportional selection",
-    0.05,
-    1000,
+    0.01,
+    2000,
     UB,
     LB,
-    0)
+    0,
+    alpha=0.99)
     
     ga_alg = GA(model)
     start = time.time()
